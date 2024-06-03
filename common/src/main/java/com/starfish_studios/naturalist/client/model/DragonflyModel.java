@@ -27,6 +27,6 @@ public class DragonflyModel extends GeoModel<Dragonfly> {
 
     @Override
     public ResourceLocation getAnimationResource(Dragonfly dragonfly) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/dragonfly.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/dragonfly.rp_anim.json");
     }
 }

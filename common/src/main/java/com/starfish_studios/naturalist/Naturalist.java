@@ -2,10 +2,8 @@ package com.starfish_studios.naturalist;
 
 import com.starfish_studios.naturalist.common.entity.*;
 import com.starfish_studios.naturalist.common.entity.core.projectile.ThrownDuckEgg;
-import com.starfish_studios.naturalist.core.registry.*;
-import com.starfish_studios.naturalist.core.platform.CommonPlatformHelper;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.impl.biome.modification.BuiltInRegistryKeys;
+import com.starfish_studios.naturalist.platform.CommonPlatformHelper;
+import com.starfish_studios.naturalist.registry.*;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
@@ -14,19 +12,15 @@ import net.minecraft.core.Position;
 import net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.WaterAnimal;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.DispensibleContainerItem;
@@ -36,13 +30,10 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.phys.BlockHitResult;
 import software.bernie.geckolib.GeckoLib;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.function.Consumer;
 
 public class Naturalist {
     public static final String MOD_ID = "naturalist";

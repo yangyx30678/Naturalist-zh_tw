@@ -1,9 +1,10 @@
 package com.starfish_studios.naturalist.common.entity;
 
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.BabyPanicGoal;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -27,8 +28,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -40,13 +40,18 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public class Boar extends Animal implements NeutralMob, GeoEntity {
+public class Boar extends Animal implements NeutralMob, NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(NaturalistTags.ItemTags.BOAR_FOOD_ITEMS);
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(20, 39);
     private int remainingPersistentAngerTime;
     @Nullable
     private UUID persistentAngerTarget;
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.boar.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.boar.walk");
+    protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.sf_nba.boar.run");
+    protected static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("animation.sf_nba.boar.attack");
 
     public Boar(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -188,14 +193,14 @@ public class Boar extends Animal implements NeutralMob, GeoEntity {
     protected <E extends Boar> PlayState predicate(final AnimationState<E> event) {
         if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
             if (this.isSprinting()) {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("boar.run"));
+                event.getController().setAnimation(RUN);
                 event.getController().setAnimationSpeed(2.0D);
             } else {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("boar.walk"));
+                event.getController().setAnimation(WALK);
                 event.getController().setAnimationSpeed(1.5D);
             }
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("boar.idle"));
+            event.getController().setAnimation(IDLE);
             event.getController().setAnimationSpeed(1.0D);
         }
         return PlayState.CONTINUE;

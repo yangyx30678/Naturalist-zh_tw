@@ -21,6 +21,6 @@ public class BassModel extends GeoModel<Bass> {
 
     @Override
     public ResourceLocation getAnimationResource(Bass bass) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/bass.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/bass.rp_anim.json");
     }
 }

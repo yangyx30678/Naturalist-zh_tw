@@ -1,18 +1,10 @@
 package com.starfish_studios.naturalist;
 
 import com.starfish_studios.naturalist.client.renderer.*;
-import com.starfish_studios.naturalist.core.platform.ClientPlatformHelper;
-import com.starfish_studios.naturalist.core.registry.*;
-import com.starfish_studios.naturalist.mixin.ClientLevelMixin;
+import com.starfish_studios.naturalist.platform.ClientPlatformHelper;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.world.item.Item;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
 
 public class NaturalistClient {
     public static void init() {
@@ -63,11 +55,5 @@ public class NaturalistClient {
         ClientPlatformHelper.registerEntityRenderers(NaturalistEntityTypes.LIZARD_TAIL, LizardTailRenderer::new);
         ClientPlatformHelper.registerEntityRenderers(NaturalistEntityTypes.TORTOISE, TortoiseRenderer::new);
         ClientPlatformHelper.registerEntityRenderers(NaturalistEntityTypes.DUCK, DuckRenderer::new);
-
-        ClientPlatformHelper.registerEntityRenderers(NaturalistEntityTypes.TOUCAN, ToucanRenderer::new);
-        ClientPlatformHelper.registerEntityRenderers(NaturalistEntityTypes.CRAB, CrabRenderer::new);
-        ClientPlatformHelper.registerEntityRenderers(NaturalistEntityTypes.MOOSE, MooseRenderer::new);
-        ClientPlatformHelper.registerEntityRenderers(NaturalistEntityTypes.CAPYBARA, CapybaraRenderer::new);
-        ClientPlatformHelper.registerEntityRenderers(NaturalistEntityTypes.EMPEROR_PENGUIN, EmperorPenguinRenderer::new);
     }
 }

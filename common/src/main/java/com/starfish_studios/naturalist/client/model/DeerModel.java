@@ -30,7 +30,7 @@ public class DeerModel extends GeoModel<Deer> {
 
     @Override
     public ResourceLocation getAnimationResource(Deer deer) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/deer.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/deer.rp_anim.json");
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.starfish_studios.naturalist.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.ElephantModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Elephant;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +19,11 @@ public class ElephantRenderer extends GeoEntityRenderer<Elephant> {
     public ElephantRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new ElephantModel());
         this.shadowRadius = 1.5F;
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Elephant animatable) {
+        return 0.000001f;
     }
 
     @Override

@@ -31,7 +31,7 @@ public class LionModel extends GeoModel<Lion> {
 
     @Override
     public ResourceLocation getAnimationResource(Lion entity) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/lion.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/lion.rp_anim.json");
     }
 
     @Override

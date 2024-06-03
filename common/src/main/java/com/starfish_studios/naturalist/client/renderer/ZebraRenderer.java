@@ -3,6 +3,7 @@ package com.starfish_studios.naturalist.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.starfish_studios.naturalist.Naturalist;
 import com.starfish_studios.naturalist.client.model.ZebraModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Zebra;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +19,11 @@ public class ZebraRenderer extends AbstractHorseRenderer<Zebra, ZebraModel> {
     public ZebraRenderer(EntityRendererProvider.Context context) {
         super(context, new ZebraModel(context.bakeLayer(LAYER_LOCATION)), 1.1F);
     }
+
+//    @Override
+//    public float getMotionAnimThreshold(Zebra animatable) {
+//        return 0.000001f;
+//    }
 
     @Override
     public ResourceLocation getTextureLocation(Zebra entity) {

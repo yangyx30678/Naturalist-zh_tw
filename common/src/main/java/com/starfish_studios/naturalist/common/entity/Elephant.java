@@ -4,9 +4,8 @@ import com.starfish_studios.naturalist.common.entity.core.ai.goal.BabyHurtByTarg
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.BabyPanicGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.DistancedFollowParentGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.navigation.MMPathNavigatorGround;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -14,7 +13,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.TimeUtil;
@@ -26,10 +24,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal;
-import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Bee;
@@ -38,7 +34,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -47,10 +43,10 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
-public class Elephant extends Animal implements NeutralMob, GeoEntity {
+public class Elephant extends Animal implements NeutralMob, NaturalistGeoEntity {
     protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.elephant.idle");
     protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.elephant.walk");
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
@@ -279,7 +275,7 @@ public class Elephant extends Animal implements NeutralMob, GeoEntity {
         if (this.swinging && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
             event.getController().forceAnimationReset();
         
-            event.getController().setAnimation(RawAnimation.begin().thenPlay("elephant.swing"));
+            event.getController().setAnimation(RawAnimation.begin().thenPlay("animation.sf_nba.elephant.swing"));
             this.swinging = false;
         }
         return PlayState.CONTINUE;

@@ -16,11 +16,7 @@ import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
 @Environment(EnvType.CLIENT)
 public class FireflyGlowLayer extends GeoRenderLayer<Firefly> {
-    private static final ResourceLocation TOP_LAYER = new ResourceLocation(Naturalist.MOD_ID, "textures/entity/firefly/firefly_glow_top.png");
-    private static final ResourceLocation BACK_LAYER = new ResourceLocation(Naturalist.MOD_ID, "textures/entity/firefly/firefly_glow_back.png");
-    private static final ResourceLocation BOTTOM_LAYER = new ResourceLocation(Naturalist.MOD_ID, "textures/entity/firefly/firefly_glow_bottom.png");
-    private static final ResourceLocation LEFT_LAYER = new ResourceLocation(Naturalist.MOD_ID, "textures/entity/firefly/firefly_glow_left.png");
-    private static final ResourceLocation RIGHT_LAYER = new ResourceLocation(Naturalist.MOD_ID, "textures/entity/firefly/firefly_glow_right.png");
+    private static final ResourceLocation GLOW = new ResourceLocation(Naturalist.MOD_ID, "textures/entity/firefly/glow.png");
     private static final ResourceLocation MODEL = new ResourceLocation(Naturalist.MOD_ID, "geo/entity/firefly.geo.json");
 
     public FireflyGlowLayer(GeoRenderer<Firefly> entityRendererIn) {
@@ -28,21 +24,9 @@ public class FireflyGlowLayer extends GeoRenderLayer<Firefly> {
     }
 
     @Override
-    public void render(PoseStack poseStack, Firefly entity, BakedGeoModel bakedModel, RenderType renderType,
-                       MultiBufferSource bufferSource, VertexConsumer buffer, float partialTicks,
-                       int packedLightIn, int packedOverlay) {
-        RenderType top = entity.isGlowing() ? RenderType.eyes(TOP_LAYER) : RenderType.entityCutoutNoCull(TOP_LAYER);
-        RenderType back = entity.isGlowing() ? RenderType.eyes(BACK_LAYER) : RenderType.entityCutoutNoCull(BACK_LAYER);
-        RenderType bottom = entity.isGlowing() ? RenderType.eyes(BOTTOM_LAYER) : RenderType.entityCutoutNoCull(BOTTOM_LAYER);
-        RenderType left = entity.isGlowing() ? RenderType.eyes(LEFT_LAYER) : RenderType.entityCutoutNoCull(LEFT_LAYER);
-        RenderType right = entity.isGlowing() ? RenderType.eyes(RIGHT_LAYER) : RenderType.entityCutoutNoCull(RIGHT_LAYER);
+    public void render(PoseStack poseStack, Firefly entity, BakedGeoModel bakedModel, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, float partialTicks, int packedLightIn, int packedOverlay) {
+        RenderType glow = entity.isGlowing() ? RenderType.eyes(GLOW) : RenderType.entityCutoutNoCull(GLOW);
 
-        // poseStack.pushPose();
-        getRenderer().reRender(getDefaultBakedModel(entity), poseStack, bufferSource, entity, top, bufferSource.getBuffer(top), partialTicks, packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
-        getRenderer().reRender(getDefaultBakedModel(entity), poseStack, bufferSource, entity, back, bufferSource.getBuffer(back), partialTicks, packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
-        getRenderer().reRender(getDefaultBakedModel(entity), poseStack, bufferSource, entity, bottom, bufferSource.getBuffer(bottom), partialTicks, packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
-        getRenderer().reRender(getDefaultBakedModel(entity), poseStack, bufferSource, entity, left, bufferSource.getBuffer(left), partialTicks, packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
-        getRenderer().reRender(getDefaultBakedModel(entity), poseStack, bufferSource, entity, right, bufferSource.getBuffer(right), partialTicks, packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
-        // poseStack.popPose();
+        getRenderer().reRender(getDefaultBakedModel(entity), poseStack, bufferSource, entity, glow, bufferSource.getBuffer(glow), partialTicks, packedLightIn, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
     }
 }

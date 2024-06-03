@@ -1,6 +1,8 @@
 package com.starfish_studios.naturalist.common.entity;
 
-import com.starfish_studios.naturalist.core.registry.*;
+
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
@@ -8,7 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.AbstractSchoolingFish;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -17,8 +19,13 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class Bass extends AbstractSchoolingFish implements GeoEntity {
+public class Bass extends AbstractSchoolingFish implements NaturalistGeoEntity {
+    // region VARIABLES
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+
+    protected static final RawAnimation SWIM = RawAnimation.begin().thenLoop("animation.sf_nba.bass.swim");
+    protected static final RawAnimation FLOP = RawAnimation.begin().thenLoop("animation.sf_nba.bass.flop");
+    // endregion
 
     public Bass(EntityType<? extends AbstractSchoolingFish> entityType, Level level) {
         super(entityType, level);
@@ -54,6 +61,12 @@ public class Bass extends AbstractSchoolingFish implements GeoEntity {
         return NaturalistSoundEvents.BASS_FLOP.get();
     }
 
+
+    @Override
+    public double getBoneResetTime() {
+        return 2;
+    }
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.geoCache;
@@ -61,18 +74,16 @@ public class Bass extends AbstractSchoolingFish implements GeoEntity {
 
     protected <E extends Bass> PlayState predicate(final AnimationState<E> event) {
         if (!this.isInWater()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("bass.flop"));
+            event.getController().setAnimation(FLOP);
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("bass.swim"));
+            event.getController().setAnimation(SWIM);
         }
         return PlayState.CONTINUE;
     }
 
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // TODO: this was 5
-        // data.setResetSpeedInTicks(5);
-        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
+        controllers.add(new AnimationController<>(this, "controller", 2, this::predicate));
     }
 
 }

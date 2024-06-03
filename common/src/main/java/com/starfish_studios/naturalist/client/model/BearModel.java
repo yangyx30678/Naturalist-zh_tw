@@ -44,7 +44,7 @@ public class BearModel extends GeoModel<Bear> {
 
     @Override
     public ResourceLocation getAnimationResource(Bear bear) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/bear.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/bear.rp_anim.json");
     }
 
     @Override

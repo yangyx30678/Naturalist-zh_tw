@@ -1,6 +1,10 @@
 package com.starfish_studios.naturalist.common.entity;
 
-import com.starfish_studios.naturalist.core.registry.*;
+
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -18,7 +22,7 @@ import net.minecraft.world.entity.animal.AbstractFish;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -27,10 +31,13 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class Catfish extends AbstractFish implements GeoEntity {
+public class Catfish extends AbstractFish implements NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final EntityDataAccessor<Integer> KILL_COOLDOWN = SynchedEntityData.defineId(Catfish.class, EntityDataSerializers.INT);
 
+
+    protected static final RawAnimation SWIM = RawAnimation.begin().thenLoop("animation.sf_nba.catfish.swim");
+    protected static final RawAnimation FLOP = RawAnimation.begin().thenLoop("animation.sf_nba.catfish.flop");
 
     public Catfish(EntityType<? extends AbstractFish> entityType, Level level) {
         super(entityType, level);
@@ -106,23 +113,27 @@ public class Catfish extends AbstractFish implements GeoEntity {
     public ItemStack getBucketItemStack() {
         return new ItemStack(NaturalistRegistry.CATFISH_BUCKET.get());
     }
+
+    @Override
+    public double getBoneResetTime() {
+        return 2;
+    }
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.geoCache;
     }
     protected <E extends Catfish> PlayState predicate(final AnimationState<E> event) {
         if (!this.isInWater()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("catfish.flop"));
+            event.getController().setAnimation(FLOP);
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("catfish.swim"));
+            event.getController().setAnimation(SWIM);
         }
         return PlayState.CONTINUE;
     }
 
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // TODO: this was 5
-        // data.setResetSpeedInTicks(5);
         controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
     }
 }

@@ -1,16 +1,15 @@
 package com.starfish_studios.naturalist.common.block;
 
 import com.starfish_studios.naturalist.common.entity.*;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;

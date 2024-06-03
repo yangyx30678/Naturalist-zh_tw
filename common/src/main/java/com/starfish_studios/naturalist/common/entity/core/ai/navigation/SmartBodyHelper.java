@@ -1,10 +1,9 @@
 package com.starfish_studios.naturalist.common.entity.core.ai.navigation;
+
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
 
-// Credit the Bob Mowzie
-// https://github.com/BobMowzie/MowziesMobs/blob/master/src/main/java/com/bobmowzie/mowziesmobs/server/entity/SmartBodyHelper.java
 public class SmartBodyHelper extends BodyRotationControl {
     private static final float MAX_ROTATE = 75;
 
@@ -37,16 +36,11 @@ public class SmartBodyHelper extends BodyRotationControl {
         double dz = delta(histPosZ);
         double distSq = dx * dx + dz * dz;
         if (distSq > 2.5e-7) {
-            boolean canLook = true;
-            if (canLook) {
-                double moveAngle = (float) Mth.atan2(dz, dx) * (180 / (float) Math.PI) - 90;
-                entity.yBodyRot += Mth.wrapDegrees(moveAngle - entity.yBodyRot) * 0.6F;
-                this.targetYawHead = this.entity.yHeadRot;
-                this.rotateTime = 0;
-            }
-            else {
-                super.clientTick();
-            }
+            double moveAngle = (float) Mth.atan2(dz, dx) * (180 / (float) Math.PI) - 90;
+            entity.yBodyRot += (float) (Mth.wrapDegrees(moveAngle - entity.yBodyRot) * 0.6F);
+            this.targetYawHead = this.entity.yHeadRot;
+            this.rotateTime = 0;
+            super.clientTick();
         } else if (entity.getPassengers().isEmpty() || !(entity.getPassengers().get(0) instanceof Mob)) {
             float limit = MAX_ROTATE;
             if (Math.abs(entity.yHeadRot - targetYawHead) > 15) {

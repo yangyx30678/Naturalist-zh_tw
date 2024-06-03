@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.Naturalist;
 import com.starfish_studios.naturalist.client.model.TortoiseModel;
 import com.starfish_studios.naturalist.client.renderer.layers.TortoiseSkinLayer;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Tortoise;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -20,7 +21,12 @@ public class TortoiseRenderer extends GeoEntityRenderer<Tortoise> {
     public TortoiseRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new TortoiseModel());
         this.shadowRadius = 0.8F;
-        this.addRenderLayer(new TortoiseSkinLayer(this, new ResourceLocation(Naturalist.MOD_ID, "geo/entity/tortoise.geo.json")));
+        this.addRenderLayer(new TortoiseSkinLayer(this));
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Tortoise animatable) {
+        return 0.000001f;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.starfish_studios.naturalist.common.block.crate;
 
 import com.starfish_studios.naturalist.common.item.*;
-import com.starfish_studios.naturalist.core.registry.*;
 import net.minecraft.core.*;
 import net.minecraft.nbt.*;
 import net.minecraft.world.*;

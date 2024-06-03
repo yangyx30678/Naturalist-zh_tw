@@ -30,6 +30,7 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
+    forgeRuntimeLibrary("com.eliotlash.mclib:mclib:20")
     // runtimeOnly "curse.maven:shutup-experimental-settings-407174:3759881"
 }
 
@@ -46,17 +47,17 @@ shadowJar {
     exclude "architectury.common.json"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    archiveClassifier = "dev-shadow"
 }
 
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier null
+    archiveClassifier = "null"
 }
 
 jar {
-    classifier "dev"
+    archiveClassifier = "dev"
 }
 
 sourcesJar {

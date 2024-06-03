@@ -3,7 +3,11 @@ package com.starfish_studios.naturalist.common.entity;
 import com.starfish_studios.naturalist.common.entity.core.EggLayingAnimal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.*;
 import com.starfish_studios.naturalist.common.entity.core.ai.navigation.MMPathNavigatorGround;
-import com.starfish_studios.naturalist.core.registry.*;
+import com.starfish_studios.naturalist.common.entity.core.ai.navigation.SmartBodyHelper;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -18,6 +22,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
@@ -29,7 +34,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -41,14 +46,21 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
+public class Alligator extends Animal implements NaturalistGeoEntity, EggLayingAnimal {
+    // region VARIABLES
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(NaturalistTags.ItemTags.ALLIGATOR_FOOD_ITEMS);
     private static final EntityDataAccessor<Boolean> HAS_EGG = SynchedEntityData.defineId(Alligator.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> LAYING_EGG = SynchedEntityData.defineId(Alligator.class, EntityDataSerializers.BOOLEAN);
 
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.alligator.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.alligator.walk");
+    protected static final RawAnimation SWIM = RawAnimation.begin().thenLoop("animation.sf_nba.alligator.swim");
+    protected static final RawAnimation BITE = RawAnimation.begin().thenPlay("animation.sf_nba.alligator.bite");
+
     int layEggCounter;
     boolean isDigging;
+    // endregion
 
     public Alligator(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -65,13 +77,13 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
         return level.getBlockState(pos.below()).is(BlockTags.FROGS_SPAWNABLE_ON) && level.getRawBrightness(pos, 0) > 8;
     }
     
-    @javax.annotation.Nullable
+    @Nullable
     @Override
     protected SoundEvent getHurtSound(DamageSource pDamageSource) {
         return this.isBaby() ? NaturalistSoundEvents.GATOR_AMBIENT_BABY.get() : NaturalistSoundEvents.GATOR_HURT.get();
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     @Override
     protected SoundEvent getDeathSound() {
         return this.isBaby() ? NaturalistSoundEvents.GATOR_AMBIENT_BABY.get() : NaturalistSoundEvents.GATOR_DEATH.get();
@@ -82,7 +94,7 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
         return this.isBaby() ? super.getVoicePitch() * 0.65F : super.getVoicePitch();
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
         return this.isBaby() ? NaturalistSoundEvents.GATOR_AMBIENT_BABY.get() : NaturalistSoundEvents.GATOR_AMBIENT.get();
@@ -112,6 +124,7 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
         this.goalSelector.addGoal(3, new BabyPanicGoal(this, 1.25D));
         this.goalSelector.addGoal(4, new FollowParentGoal(this, 1.2D));
         this.goalSelector.addGoal(5, new RandomSwimmingGoal(this, 1.0D, 10));
+        this.goalSelector.addGoal(5, new RandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 6.0F));
         this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(1, new BabyHurtByTargetGoal(this));
@@ -151,6 +164,8 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
     public boolean canBreatheUnderwater() {
         return true;
     }
+
+    // region DATA
 
     @Override
     public boolean hasEgg() {
@@ -218,6 +233,8 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
         return super.canFallInLove() && !this.hasEgg();
     }
 
+    // endregion
+
     @Override
     public void aiStep() {
         super.aiStep();
@@ -225,6 +242,12 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
         if (this.isAlive() && this.isLayingEgg() && this.layEggCounter >= 1 && this.layEggCounter % 5 == 0 && this.level().getBlockState(pos.below()).is(this.getEggLayableBlockTag())) {
             this.level().levelEvent(2001, pos, Block.getId(this.level().getBlockState(pos.below())));
         }
+    }
+
+    // region GECKOLIB
+    @Override
+    public double getBoneResetTime() {
+        return 5;
     }
 
     @Override
@@ -238,16 +261,16 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
             event.getController().forceAnimationReset();
         } else*/ if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
             if (this.isInWater()) {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("swim"));
+                event.getController().setAnimation(SWIM);
             } else {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("walk"));
+                event.getController().setAnimation(WALK);
                 if (this.isBaby()) {
                     event.getController().setAnimationSpeed(1.7D);
                 }
                 event.getController().setAnimationSpeed(1.5D);
             }
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
+            event.getController().setAnimation(IDLE);
             event.getController().setAnimationSpeed(0.6D);
         }
         return PlayState.CONTINUE;
@@ -255,7 +278,7 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
 
      protected <E extends Alligator> PlayState attackPredicate(final AnimationState<E> event) {
         if (this.swinging && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
-            event.getController().setAnimation(RawAnimation.begin().thenPlay("bite"));
+            event.getController().setAnimation(BITE);
             event.getController().forceAnimationReset();
         
             this.swinging = false;
@@ -263,12 +286,10 @@ public class Alligator extends Animal implements GeoEntity, EggLayingAnimal {
         return PlayState.CONTINUE;
     }
 
-
-
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // data.setResetSpeedInTicks(10);
         controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
         controllers.add(new AnimationController<>(this, "attackController", 2, this::attackPredicate));
     }
+    // endregion
 }

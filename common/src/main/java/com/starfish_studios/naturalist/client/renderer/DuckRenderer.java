@@ -3,6 +3,7 @@ package com.starfish_studios.naturalist.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.DuckModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Duck;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +19,11 @@ public class DuckRenderer extends GeoEntityRenderer<Duck> {
     public DuckRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new DuckModel());
         this.shadowRadius = 0.3F;
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Duck animatable) {
+        return 0.000001f;
     }
 
     @Override

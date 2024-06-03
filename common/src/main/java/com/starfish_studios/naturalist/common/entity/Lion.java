@@ -5,9 +5,9 @@ import com.starfish_studios.naturalist.common.entity.core.ai.goal.BabyHurtByTarg
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.BabyPanicGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.SleepGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.navigation.BetterGroundPathNavigation;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -34,7 +34,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -47,10 +47,19 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class Lion extends Animal implements GeoEntity, SleepingAnimal {
+public class Lion extends Animal implements NaturalistGeoEntity, SleepingAnimal {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final EntityDataAccessor<Boolean> SLEEPING = SynchedEntityData.defineId(Lion.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HAS_MANE = SynchedEntityData.defineId(Lion.class, EntityDataSerializers.BOOLEAN);
+
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.lion.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.lion.walk");
+    protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.sf_nba.lion.run");
+    protected static final RawAnimation PREY = RawAnimation.begin().thenLoop("animation.sf_nba.lion.prey");
+    protected static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("animation.sf_nba.lion.swing");
+    protected static final RawAnimation SLEEP = RawAnimation.begin().thenLoop("animation.sf_nba.lion.sleep");
+    protected static final RawAnimation SLEEP2 = RawAnimation.begin().thenLoop("animation.sf_nba.lion.sleep2");
 
     public Lion(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -220,22 +229,22 @@ public class Lion extends Animal implements GeoEntity, SleepingAnimal {
 
     private <E extends Lion> PlayState predicate(final AnimationState<E> event) {
         if (this.isSleeping() && this.hasMane()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("sleep2"));
+            event.getController().setAnimation(SLEEP2);
         } else if (this.isSleeping() && !this.hasMane()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("sleep"));
+            event.getController().setAnimation(SLEEP);
         } else if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
             if (this.isSprinting()) {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("run"));
+                event.getController().setAnimation(RUN);
                 event.getController().setAnimationSpeed(2.5F);
             } else if (this.isCrouching()) {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("prey"));
+                event.getController().setAnimation(PREY);
                 event.getController().setAnimationSpeed(0.8F);
             } else {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("walk"));
+                event.getController().setAnimation(WALK);
                 event.getController().setAnimationSpeed(1.0F);
             }
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
+            event.getController().setAnimation(IDLE);
             event.getController().setAnimationSpeed(1.0F);
         }
         return PlayState.CONTINUE;

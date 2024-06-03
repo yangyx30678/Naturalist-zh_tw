@@ -1,6 +1,7 @@
 package com.starfish_studios.naturalist.mixin;
 
-import com.starfish_studios.naturalist.core.registry.*;
+
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;

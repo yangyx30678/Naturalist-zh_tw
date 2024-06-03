@@ -23,6 +23,11 @@ public class AlligatorRenderer extends GeoEntityRenderer<Alligator> {
     }
 
     @Override
+    public float getMotionAnimThreshold(Alligator animatable) {
+        return 0.000001f;
+    }
+
+    @Override
     public void render(Alligator entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         if (entity.isBaby()) {
             poseStack.scale(0.4F, 0.4F, 0.4F);

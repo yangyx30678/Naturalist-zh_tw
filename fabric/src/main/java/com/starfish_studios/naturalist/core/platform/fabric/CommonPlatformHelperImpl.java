@@ -4,7 +4,7 @@ import com.starfish_studios.naturalist.Naturalist;
 import com.starfish_studios.naturalist.common.item.fabric.*;
 import com.starfish_studios.naturalist.mixin.fabric.PotionBrewingInvoker;
 import com.starfish_studios.naturalist.mixin.fabric.SpawnPlacementsInvoker;
-import com.starfish_studios.naturalist.core.registry.NaturalistMenus;
+import com.starfish_studios.naturalist.registry.NaturalistMenus;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;

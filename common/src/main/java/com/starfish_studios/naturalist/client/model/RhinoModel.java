@@ -26,7 +26,7 @@ public class RhinoModel extends GeoModel<Rhino> {
 
     @Override
     public ResourceLocation getAnimationResource(Rhino rhino) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/rhino.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/rhino.rp_anim.json");
     }
 
     @Override

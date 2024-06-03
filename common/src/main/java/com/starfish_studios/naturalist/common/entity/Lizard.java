@@ -1,7 +1,7 @@
 package com.starfish_studios.naturalist.common.entity;
 
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -27,8 +27,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -37,13 +36,19 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class Lizard extends TamableAnimal implements GeoEntity {
+public class Lizard extends TamableAnimal implements NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final EntityDataAccessor<Integer> VARIANT_ID = SynchedEntityData.defineId(Lizard.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> HAS_TAIL = SynchedEntityData.defineId(Lizard.class, EntityDataSerializers.BOOLEAN);
     private static final Ingredient TEMPT_INGREDIENT = Ingredient.of(NaturalistTags.ItemTags.LIZARD_TEMPT_ITEMS);
     private LizardAvoidEntityGoal<Player> avoidPlayersGoal;
     private int tailRegrowCooldown = 0;
+
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.lizard.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.lizard.walk");
+    protected static final RawAnimation SIT = RawAnimation.begin().thenLoop("animation.sf_nba.lizard.sit");
+    protected static final RawAnimation SLEEP = RawAnimation.begin().thenLoop("animation.sf_nba.lizard.sleep");
 
     public Lizard(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
@@ -213,7 +218,7 @@ public class Lizard extends TamableAnimal implements GeoEntity {
 
     @Override
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @javax.annotation.Nullable SpawnGroupData spawnData, @javax.annotation.Nullable CompoundTag dataTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag) {
         Holder<Biome> holder = level.getBiome(this.blockPosition());
         if (holder.is(Biomes.SAVANNA)) {
             this.setVariant(3);
@@ -233,10 +238,10 @@ public class Lizard extends TamableAnimal implements GeoEntity {
 
     private <E extends Lizard> PlayState predicate(final AnimationState<E> event) {
         if (this.isInSittingPose()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("sit"));
+            event.getController().setAnimation(SIT);
             return PlayState.CONTINUE;
         } else if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("walk"));
+            event.getController().setAnimation(WALK);
             event.getController().setAnimationSpeed(2.0D);
             return PlayState.CONTINUE;
         }

@@ -4,9 +4,9 @@ import com.starfish_studios.naturalist.common.entity.core.ClimbingAnimal;
 import com.starfish_studios.naturalist.common.entity.core.SleepingAnimal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.SearchForItemsGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.SleepGoal;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -43,7 +43,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.Path;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -53,11 +53,11 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class Snake extends ClimbingAnimal implements SleepingAnimal, NeutralMob, GeoEntity {
+public class Snake extends ClimbingAnimal implements SleepingAnimal, NeutralMob, NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(NaturalistTags.ItemTags.SNAKE_TEMPT_ITEMS);
     private static final Ingredient TAME_ITEMS = Ingredient.of(NaturalistTags.ItemTags.SNAKE_TAME_ITEMS);
@@ -67,6 +67,13 @@ public class Snake extends ClimbingAnimal implements SleepingAnimal, NeutralMob,
     private static final EntityDataAccessor<Integer> EAT_COUNTER = SynchedEntityData.defineId(Snake.class, EntityDataSerializers.INT);
     @Nullable
     private UUID persistentAngerTarget;
+
+    protected static final RawAnimation MOVE = RawAnimation.begin().thenPlay("animation.sf_nba.snake.move");
+    protected static final RawAnimation SLEEP = RawAnimation.begin().thenLoop("animation.sf_nba.snake.sleep");
+    protected static final RawAnimation CLIMB = RawAnimation.begin().thenLoop("animation.sf_nba.snake.climb");
+    protected static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("animation.sf_nba.snake.attack");
+    protected static final RawAnimation TONGUE = RawAnimation.begin().thenPlay("animation.sf_nba.snake.tongue");
+    protected static final RawAnimation RATTLE = RawAnimation.begin().thenLoop("animation.sf_nba.snake.rattle");
 
     public Snake(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -409,13 +416,13 @@ public class Snake extends ClimbingAnimal implements SleepingAnimal, NeutralMob,
 
     private <E extends Snake> PlayState predicate(final AnimationState<E> event) {
         if (this.isSleeping()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("snake.sleep"));
+            event.getController().setAnimation(SLEEP);
             return PlayState.CONTINUE;
         } else if (this.isClimbing()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("snake.climb"));
+            event.getController().setAnimation(CLIMB);
             return PlayState.CONTINUE;
         } else if (!(event.getLimbSwingAmount() > -0.04F && event.getLimbSwingAmount() < 0.04F)) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("snake.move"));
+            event.getController().setAnimation(MOVE);
             return PlayState.CONTINUE;
         }
         event.getController().forceAnimationReset();
@@ -427,7 +434,7 @@ public class Snake extends ClimbingAnimal implements SleepingAnimal, NeutralMob,
         if (this.swinging && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
             event.getController().forceAnimationReset();
         
-            event.getController().setAnimation(RawAnimation.begin().thenPlay("snake.attack"));
+            event.getController().setAnimation(ATTACK);
             this.swinging = false;
         }
         return PlayState.CONTINUE;
@@ -437,14 +444,14 @@ public class Snake extends ClimbingAnimal implements SleepingAnimal, NeutralMob,
         if (this.random.nextInt(1000) < this.ambientSoundTime && !this.isSleeping() && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
             event.getController().forceAnimationReset();
         
-            event.getController().setAnimation(RawAnimation.begin().thenPlay("snake.tongue"));
+            event.getController().setAnimation(TONGUE);
         }
         return PlayState.CONTINUE;
     }
 
     private <E extends Snake> PlayState rattlePredicate(final AnimationState<E> event) {
         if (this.canRattle() && !this.isSleeping()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("snake.rattle"));
+            event.getController().setAnimation(RATTLE);
             return PlayState.CONTINUE;
         }
         event.getController().forceAnimationReset();
@@ -463,8 +470,6 @@ public class Snake extends ClimbingAnimal implements SleepingAnimal, NeutralMob,
 
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // TODO: used to be 10
-        // data.setResetSpeedInTicks(10);
         controllers.add(new AnimationController<>(this, "controller", 10, this::predicate));
         controllers.add(new AnimationController<>(this, "attackController", 0, this::attackPredicate));
 

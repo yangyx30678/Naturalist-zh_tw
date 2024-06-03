@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -21,9 +21,12 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import software.bernie.geckolib.core.animation.AnimationState;
 
-public class LizardTail extends Mob implements GeoEntity {
+public class LizardTail extends Mob implements NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final EntityDataAccessor<Integer> VARIANT_ID = SynchedEntityData.defineId(LizardTail.class, EntityDataSerializers.INT);
+
+
+    protected static final RawAnimation FLOP = RawAnimation.begin().thenLoop("animation.sf_nba.lizard_tail.flop");
 
     public LizardTail(EntityType<? extends Mob> entityType, Level level) {
         super(entityType, level);
@@ -80,7 +83,7 @@ public class LizardTail extends Mob implements GeoEntity {
     }
 
     private <E extends LizardTail> PlayState predicate(final AnimationState<E> event) {
-        event.getController().setAnimation(RawAnimation.begin().thenLoop("lizard_tail.flip"));
+        event.getController().setAnimation(FLOP);
         return PlayState.CONTINUE;
     }
 

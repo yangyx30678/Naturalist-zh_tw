@@ -1,7 +1,7 @@
 package com.starfish_studios.naturalist.common.block;
 
 import com.starfish_studios.naturalist.common.entity.Butterfly;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ChrysalisBlock extends HorizontalDirectionalBlock {
     public static final IntegerProperty AGE = BlockStateProperties.AGE_3;

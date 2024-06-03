@@ -4,7 +4,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.animal.Animal;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class DistancedFollowParentGoal extends Goal {

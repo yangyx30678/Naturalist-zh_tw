@@ -28,6 +28,6 @@ public class LizardTailModel extends GeoModel<LizardTail> {
 
     @Override
     public ResourceLocation getAnimationResource(LizardTail lizard) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/lizard_tail.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/lizard_tail.rp_anim.json");
     }
 }

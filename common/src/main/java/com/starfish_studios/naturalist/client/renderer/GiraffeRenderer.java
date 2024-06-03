@@ -3,6 +3,7 @@ package com.starfish_studios.naturalist.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.GiraffeModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Giraffe;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +19,11 @@ public class GiraffeRenderer extends GeoEntityRenderer<Giraffe> {
     public GiraffeRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new GiraffeModel());
         this.shadowRadius = 1.1F;
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Giraffe animatable) {
+        return 0.000001f;
     }
 
     @Override

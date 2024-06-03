@@ -1,8 +1,8 @@
 package com.starfish_studios.naturalist.common.entity;
 
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.FlyingWanderGoal;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -23,8 +23,6 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.ai.util.AirAndWaterRandomPos;
-import net.minecraft.world.entity.ai.util.HoverRandomPos;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
@@ -40,7 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -52,10 +50,13 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.EnumSet;
 import java.util.List;
 
-public class Vulture extends PathfinderMob implements GeoEntity, FlyingAnimal {
+public class Vulture extends PathfinderMob implements NaturalistGeoEntity, FlyingAnimal {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(Items.ROTTEN_FLESH);
     private int ticksSinceEaten;
+
+    protected static final RawAnimation FLY = RawAnimation.begin().thenLoop("animation.sf_nba.vulture.fly");
+    
 
     public Vulture(EntityType<? extends PathfinderMob> entityType, Level level) {
         super(entityType, level);
@@ -259,24 +260,13 @@ public class Vulture extends PathfinderMob implements GeoEntity, FlyingAnimal {
     }
 
     private <E extends Vulture> PlayState predicate(final AnimationState<E> event) {
-        if (this.isFlying() && this.getDeltaMovement().y > 0) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("fly2"));
-            event.getController().setAnimationSpeed(1.5F);
-        } else if (this.isFlying() && this.getDeltaMovement().y < 0) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("glide2"));
-        } else if (this.isFlying()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("fly"));
-        } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("vulture.idle"));
-        }
+        event.getController().setAnimation(FLY);
         return PlayState.CONTINUE;
     }
 
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // TODO: used to be 10
-        // data.setResetSpeedInTicks(10);
-        controllers.add(new AnimationController<>(this, "controller", 10, this::predicate));
+        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
     }
 
 

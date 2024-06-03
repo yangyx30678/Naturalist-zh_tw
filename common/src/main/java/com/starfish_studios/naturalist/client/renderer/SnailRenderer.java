@@ -13,13 +13,18 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @Environment(EnvType.CLIENT)
 public class SnailRenderer extends GeoEntityRenderer<Snail> {
     public SnailRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new SnailModel());
         this.shadowRadius = 0.2F;
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Snail animatable) {
+        return 0.000001f;
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.starfish_studios.naturalist.client.model;
 
 import com.starfish_studios.naturalist.Naturalist;
 import com.starfish_studios.naturalist.common.entity.Bird;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +40,7 @@ public class BirdModel extends GeoModel<Bird> {
 
     @Override
     public ResourceLocation getAnimationResource(Bird bird) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/bird.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/bird.rp_anim.json");
     }
 
     @Override

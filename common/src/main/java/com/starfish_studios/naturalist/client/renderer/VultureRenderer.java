@@ -4,6 +4,7 @@ import com.mojang.authlib.minecraft.client.MinecraftClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.VultureModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Vulture;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -28,6 +29,11 @@ public class VultureRenderer extends GeoEntityRenderer<Vulture> {
         super(renderManager, new VultureModel());
         this.shadowRadius = 0.65F;
         ItemInHandRenderer itemRenderer = Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer();
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Vulture animatable) {
+        return 0.000001f;
     }
 
    public RenderType getRenderType(Vulture entity, float partialTicks, PoseStack stack, @Nullable MultiBufferSource renderTypeBuffer, @Nullable VertexConsumer vertexBuilder, int packedLightIn, ResourceLocation textureLocation) {

@@ -21,6 +21,6 @@ public class FireflyModel extends GeoModel<Firefly> {
 
     @Override
     public ResourceLocation getAnimationResource(Firefly firefly) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/firefly.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/firefly.rp_anim.json");
     }
 }

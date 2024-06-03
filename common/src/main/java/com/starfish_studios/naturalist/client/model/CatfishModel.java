@@ -21,6 +21,6 @@ public class CatfishModel extends GeoModel<Catfish> {
 
     @Override
     public ResourceLocation getAnimationResource(Catfish catfish) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/catfish.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/catfish.rp_anim.json");
     }
 }

@@ -1,9 +1,13 @@
 package com.starfish_studios.naturalist.common.entity;
 
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import com.starfish_studios.naturalist.common.entity.core.SleepingAnimal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.*;
 import com.starfish_studios.naturalist.common.entity.core.ai.navigation.MMPathNavigatorGround;
-import com.starfish_studios.naturalist.core.registry.*;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ItemParticleOption;
@@ -50,7 +54,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -59,12 +63,13 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public class Bear extends Animal implements NeutralMob, GeoEntity, SleepingAnimal, Shearable {
+public class Bear extends Animal implements NeutralMob, NaturalistGeoEntity, SleepingAnimal, Shearable {
+    // region VARIABLES
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(NaturalistTags.ItemTags.BEAR_TEMPT_ITEMS);
     private static final EntityDataAccessor<Boolean> SLEEPING = SynchedEntityData.defineId(Bear.class, EntityDataSerializers.BOOLEAN);
@@ -76,6 +81,17 @@ public class Bear extends Animal implements NeutralMob, GeoEntity, SleepingAnima
     private static final EntityDataAccessor<Integer> REMAINING_ANGER_TIME = SynchedEntityData.defineId(Bear.class, EntityDataSerializers.INT);
     @Nullable
     private UUID persistentAngerTarget;
+
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.bear.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.bear.walk");
+    protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.sf_nba.bear.run");
+    protected static final RawAnimation SIT = RawAnimation.begin().thenLoop("animation.sf_nba.bear.sit");
+    protected static final RawAnimation SLEEP = RawAnimation.begin().thenLoop("animation.sf_nba.bear.sleep");
+    protected static final RawAnimation SNIFF = RawAnimation.begin().thenLoop("animation.sf_nba.bear.sniff");
+    protected static final RawAnimation EAT = RawAnimation.begin().thenLoop("animation.sf_nba.bear.eat");
+    protected static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("animation.sf_nba.bear.attack");
+    // endregion
 
     public Bear(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -470,6 +486,7 @@ public class Bear extends Animal implements NeutralMob, GeoEntity, SleepingAnima
     }
 
     // ANIMATION
+
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.geoCache;
@@ -477,23 +494,23 @@ public class Bear extends Animal implements NeutralMob, GeoEntity, SleepingAnima
 
     protected <E extends Bear> PlayState predicate(final AnimationState<E> event) {
         if (this.isSleeping()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("sleep"));
+            event.getController().setAnimation(SLEEP);
             return PlayState.CONTINUE;
         } else if (this.isSitting()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("sit"));
+            event.getController().setAnimation(SIT);
             return PlayState.CONTINUE;
         } else if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
             if (this.isSprinting()) {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("run"));
+                event.getController().setAnimation(RUN);
                 event.getController().setAnimationSpeed(2.0D);
                 return PlayState.CONTINUE;
             } else {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("walk"));
+                event.getController().setAnimation(WALK);
                 event.getController().setAnimationSpeed(1.4D);
                 return PlayState.CONTINUE;
             }
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
+            event.getController().setAnimation(IDLE);
         }
         event.getController().forceAnimationReset();
         
@@ -502,7 +519,7 @@ public class Bear extends Animal implements NeutralMob, GeoEntity, SleepingAnima
 
     protected <E extends Bear> PlayState sniffPredicate(final AnimationState<E> event) {
         if (this.isSniffing()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("sniff"));
+            event.getController().setAnimation(SNIFF);
             return PlayState.CONTINUE;
         }
         event.getController().forceAnimationReset();
@@ -514,7 +531,7 @@ public class Bear extends Animal implements NeutralMob, GeoEntity, SleepingAnima
         if (this.swinging && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
             event.getController().forceAnimationReset();
         
-            event.getController().setAnimation(RawAnimation.begin().thenPlay("attack"));
+            event.getController().setAnimation(ATTACK);
             this.swinging = false;
         }
         return PlayState.CONTINUE;
@@ -522,7 +539,7 @@ public class Bear extends Animal implements NeutralMob, GeoEntity, SleepingAnima
 
     protected <E extends Bear> PlayState eatPredicate(final AnimationState<E> event) {
         if (this.isEating()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("eat"));
+            event.getController().setAnimation(EAT);
             return PlayState.CONTINUE;
         }
         event.getController().forceAnimationReset();
@@ -532,11 +549,9 @@ public class Bear extends Animal implements NeutralMob, GeoEntity, SleepingAnima
 
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // TODO: this was 5
-        // data.setResetSpeedInTicks(5);
-        controllers.add(new AnimationController<>(this, "controller", 10, this::predicate));
-        controllers.add(new AnimationController<>(this, "sniffController", 0, this::sniffPredicate));
-        controllers.add(new AnimationController<>(this, "swingController", 0, this::attackPredicate));
+        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
+        controllers.add(new AnimationController<>(this, "sniffController", 2, this::sniffPredicate));
+        controllers.add(new AnimationController<>(this, "swingController", 2, this::attackPredicate));
         controllers.add(new AnimationController<>(this, "eatController", 5, this::eatPredicate));
     }
 

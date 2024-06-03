@@ -1,27 +1,5 @@
 package com.starfish_studios.naturalist.common.block;
 
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.TurtleEggBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
-
 /*public class OstrichEggBlock extends TurtleEggBlock {
 
     private static final VoxelShape EGG_AABB = Block.box(5.0, 0.0, 5.0, 11.0, 8.0, 11.0);

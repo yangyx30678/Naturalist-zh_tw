@@ -2,7 +2,7 @@ package com.starfish_studios.naturalist.client.model;
 
 import com.starfish_studios.naturalist.Naturalist;
 import com.starfish_studios.naturalist.common.entity.Snake;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +33,7 @@ public class SnakeModel extends GeoModel<Snake> {
 
     @Override
     public ResourceLocation getAnimationResource(Snake snake) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/snake.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/snake.rp_anim.json");
     }
 
     @Override

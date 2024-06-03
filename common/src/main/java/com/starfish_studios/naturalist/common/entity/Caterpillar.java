@@ -1,10 +1,10 @@
 package com.starfish_studios.naturalist.common.entity;
 
-import com.starfish_studios.naturalist.Naturalist;
 import com.starfish_studios.naturalist.common.block.ChrysalisBlock;
 import com.starfish_studios.naturalist.common.entity.core.Catchable;
 import com.starfish_studios.naturalist.common.entity.core.ClimbingAnimal;
-import com.starfish_studios.naturalist.core.registry.*;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -29,7 +29,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -39,7 +38,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -48,9 +47,12 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class Caterpillar extends ClimbingAnimal implements GeoEntity, Catchable {
+public class Caterpillar extends ClimbingAnimal implements NaturalistGeoEntity, Catchable {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final EntityDataAccessor<Boolean> FROM_HAND;
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.caterpillar.idle");
+    protected static final RawAnimation CRAWL = RawAnimation.begin().thenLoop("animation.sf_nba.caterpillar.crawl");
 
     public Caterpillar(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -76,7 +78,7 @@ public class Caterpillar extends ClimbingAnimal implements GeoEntity, Catchable 
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @javax.annotation.Nullable SpawnGroupData pSpawnData, @javax.annotation.Nullable CompoundTag pDataTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         this.setAge(0);
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
@@ -118,11 +120,11 @@ public class Caterpillar extends ClimbingAnimal implements GeoEntity, Catchable 
     protected <E extends Caterpillar> PlayState predicate(final AnimationState<E> event) {
         if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
             {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("crawl"));
+                event.getController().setAnimation(CRAWL);
                 return PlayState.CONTINUE;
             }
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
+            event.getController().setAnimation(IDLE);
             return PlayState.CONTINUE;
         }
     }

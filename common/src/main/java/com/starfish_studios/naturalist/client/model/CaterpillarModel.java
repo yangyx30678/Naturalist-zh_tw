@@ -21,6 +21,6 @@ public class CaterpillarModel extends GeoModel<Caterpillar> {
 
     @Override
     public ResourceLocation getAnimationResource(Caterpillar animatable) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/caterpillar.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/caterpillar.rp_anim.json");
     }
 }

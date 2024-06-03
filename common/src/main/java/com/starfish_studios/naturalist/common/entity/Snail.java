@@ -4,9 +4,11 @@ import com.starfish_studios.naturalist.common.entity.core.ClimbingAnimal;
 import com.starfish_studios.naturalist.common.entity.core.EggLayingAnimal;
 import com.starfish_studios.naturalist.common.entity.core.HidingAnimal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.EggLayingBreedGoal;
-import com.starfish_studios.naturalist.common.entity.core.ai.goal.HideGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.LayEggGoal;
-import com.starfish_studios.naturalist.core.registry.*;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -36,7 +38,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -48,7 +50,7 @@ import software.bernie.geckolib.core.animation.AnimationState;
 
 import java.util.*;
 
-public class Snail extends ClimbingAnimal implements GeoEntity, Bucketable, HidingAnimal, EggLayingAnimal {
+public class Snail extends ClimbingAnimal implements NaturalistGeoEntity, Bucketable, HidingAnimal, EggLayingAnimal {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(Items.BEETROOT);
     private static EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(Snail.class, EntityDataSerializers.BOOLEAN);
@@ -56,6 +58,11 @@ public class Snail extends ClimbingAnimal implements GeoEntity, Bucketable, Hidi
     private static final EntityDataAccessor<Boolean> HAS_EGG = SynchedEntityData.defineId(Snail.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> LAYING_EGG = SynchedEntityData.defineId(Snail.class, EntityDataSerializers.BOOLEAN);
     int layEggCounter;
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.snail.idle");
+    protected static final RawAnimation CRAWL = RawAnimation.begin().thenLoop("animation.sf_nba.snail.crawl");
+    protected static final RawAnimation CLIMB = RawAnimation.begin().thenLoop("animation.sf_nba.snail.climb");
+    protected static final RawAnimation HIDE = RawAnimation.begin().thenPlay("animation.sf_nba.snail.hide_start").thenLoop("animation.sf_nba.snail.hide_idle");
 
     public Snail(EntityType<? extends Animal> type, Level level) {
         super(type, level);
@@ -378,17 +385,19 @@ public class Snail extends ClimbingAnimal implements GeoEntity, Bucketable, Hidi
     }
 
     private <E extends Snail> PlayState predicate(final AnimationState<E> event) {
-        if (this.canHide()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("retreat"));
-        } else if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("crawl"));
-            event.getController().setAnimationSpeed(0.6F);
+        if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
+            event.getController().setAnimation(CRAWL);
         } else if (this.isClimbing()){
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("climb"));
-            event.getController().setAnimationSpeed(0.6F);
+            event.getController().setAnimation(CLIMB);
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
-            event.getController().setAnimationSpeed(0.4F);
+            event.getController().setAnimation(IDLE);
+        }
+        return PlayState.CONTINUE;
+    }
+
+    private <E extends Snail> PlayState hidePredicate(final AnimationState<E> event) {
+        if (this.canHide()) {
+            event.getController().setAnimation(HIDE);
         }
         return PlayState.CONTINUE;
     }
@@ -407,9 +416,8 @@ public class Snail extends ClimbingAnimal implements GeoEntity, Bucketable, Hidi
 
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        AnimationController<Snail> controller = new AnimationController<>(this, "controller", 2, this::predicate);
-        controller.setSoundKeyframeHandler(this::soundListener);
-        controllers.add(controller);
+        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate).setSoundKeyframeHandler(this::soundListener));
+        controllers.add(new AnimationController<>(this, "hideController", 0, this::hidePredicate));
     }
 
 

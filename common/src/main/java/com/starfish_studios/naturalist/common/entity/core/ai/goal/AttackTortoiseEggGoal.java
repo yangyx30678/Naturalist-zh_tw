@@ -1,13 +1,12 @@
 package com.starfish_studios.naturalist.common.entity.core.ai.goal;
 
-import com.starfish_studios.naturalist.core.registry.NaturalistRegistry;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.RemoveBlockGoal;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;

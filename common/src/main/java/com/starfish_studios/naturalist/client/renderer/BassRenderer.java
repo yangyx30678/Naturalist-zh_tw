@@ -3,6 +3,7 @@ package com.starfish_studios.naturalist.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.BassModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Bass;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +19,11 @@ public class BassRenderer extends GeoEntityRenderer<Bass> {
     public BassRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new BassModel());
         this.shadowRadius = 0.4F;
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Bass animatable) {
+        return 0.000001f;
     }
 
    public RenderType getRenderType(Bass entity, float partialTicks, PoseStack stack, @Nullable MultiBufferSource renderTypeBuffer, @Nullable VertexConsumer vertexBuilder, int packedLightIn, ResourceLocation textureLocation) {

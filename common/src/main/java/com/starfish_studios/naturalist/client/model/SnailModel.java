@@ -34,7 +34,7 @@ public class SnailModel extends GeoModel<Snail> {
 
     @Override
     public ResourceLocation getAnimationResource(Snail snail) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/snail.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/snail.rp_anim.json");
     }
 
     @Override

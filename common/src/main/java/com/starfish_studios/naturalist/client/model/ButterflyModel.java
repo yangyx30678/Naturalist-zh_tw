@@ -31,9 +31,8 @@ public class ButterflyModel extends GeoModel<Butterfly> {
         }
     }
 
-
     @Override
     public ResourceLocation getAnimationResource(Butterfly butterfly) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/butterfly.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/butterfly.rp_anim.json");
     }
 }

@@ -3,6 +3,7 @@ package com.starfish_studios.naturalist.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.DeerModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Deer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +19,11 @@ public class DeerRenderer extends GeoEntityRenderer<Deer> {
     public DeerRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new DeerModel());
         this.shadowRadius = 0.8F;
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Deer animatable) {
+        return 0.000001f;
     }
 
     @Override

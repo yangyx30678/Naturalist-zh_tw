@@ -1,7 +1,10 @@
 package com.starfish_studios.naturalist.common.entity;
 
 import com.starfish_studios.naturalist.common.entity.core.ai.navigation.MMPathNavigatorGround;
-import com.starfish_studios.naturalist.core.registry.*;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -27,8 +30,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -37,7 +39,7 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class Duck extends Animal implements GeoEntity {
+public class Duck extends Animal implements NaturalistGeoEntity {
     private static final Ingredient FOOD_ITEMS = Ingredient.of(NaturalistTags.ItemTags.DUCK_FOOD_ITEMS);
     public float flap;
     public float flapSpeed;
@@ -48,6 +50,12 @@ public class Duck extends Animal implements GeoEntity {
     public int eggTime;
 
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.duck.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.duck.walk");
+    protected static final RawAnimation SWIM = RawAnimation.begin().thenLoop("animation.sf_nba.duck.swim");
+    protected static final RawAnimation FLAP = RawAnimation.begin().thenLoop("animation.sf_nba.duck.flap");
 
     public Duck(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -209,21 +217,21 @@ public class Duck extends Animal implements GeoEntity {
 
     protected <E extends Duck> PlayState predicate(final AnimationState<E> event) {
         if (this.isInWater()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("swim"));
+            event.getController().setAnimation(SWIM);
             event.getController().setAnimationSpeed(1.0D);
             return PlayState.CONTINUE;
         } else if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
              if (this.isSprinting()) {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("walk"));
+                event.getController().setAnimation(WALK);
                 event.getController().setAnimationSpeed(2.0D);
                 return PlayState.CONTINUE;
             } else {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("walk"));
+                event.getController().setAnimation(WALK);
                 event.getController().setAnimationSpeed(1.5D);
                 return PlayState.CONTINUE;
             }
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
+            event.getController().setAnimation(IDLE);
             event.getController().setAnimationSpeed(1.0D);
         }
         return PlayState.CONTINUE;
@@ -231,18 +239,7 @@ public class Duck extends Animal implements GeoEntity {
 
     protected <E extends Duck> PlayState flapPredicate(final AnimationState<E> event) {
         if (!this.onGround() && !this.isInWater()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("flap"));
-            event.getController().setAnimationSpeed(1.0D);
-            return PlayState.CONTINUE;
-        }
-        event.getController().forceAnimationReset();
-        
-        return PlayState.STOP;
-    }
-
-    protected <E extends Duck> PlayState hurtPredicate(final AnimationState<E> event) {
-        if (this.hurtTime > 0) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("hurt"));
+            event.getController().setAnimation(FLAP);
             event.getController().setAnimationSpeed(1.0D);
             return PlayState.CONTINUE;
         }
@@ -254,9 +251,8 @@ public class Duck extends Animal implements GeoEntity {
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
         // data.setResetSpeedInTicks(10);
-        controllers.add(new AnimationController<>(this, "controller", 10, this::predicate));
-        controllers.add(new AnimationController<>(this, "flapController", 4, this::flapPredicate));
-        controllers.add(new AnimationController<>(this, "hurtController", 4, this::hurtPredicate));
+        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
+        controllers.add(new AnimationController<>(this, "flapController", 2, this::flapPredicate));
     }
 
 }

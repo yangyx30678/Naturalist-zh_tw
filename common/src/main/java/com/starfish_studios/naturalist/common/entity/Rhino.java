@@ -3,9 +3,9 @@ package com.starfish_studios.naturalist.common.entity;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.BabyHurtByTargetGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.BabyPanicGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.navigation.BetterGroundPathNavigation;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -18,7 +18,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -38,7 +37,7 @@ import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -51,12 +50,19 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.EnumSet;
 import java.util.List;
 
-public class Rhino extends Animal implements GeoEntity {
+public class Rhino extends Animal implements NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final EntityDataAccessor<Integer> CHARGE_COOLDOWN_TICKS = SynchedEntityData.defineId(Rhino.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> HAS_TARGET = SynchedEntityData.defineId(Rhino.class, EntityDataSerializers.BOOLEAN);
     private int stunnedTick;
     private boolean canBePushed = true;
+    
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.rhino.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.rhino.walk");
+    protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.sf_nba.rhino.run");
+    protected static final RawAnimation ATTACK = RawAnimation.begin().thenLoop("animation.sf_nba.rhino.attack");
+    protected static final RawAnimation FOOT = RawAnimation.begin().thenLoop("animation.sf_nba.rhino.foot");
+    protected static final RawAnimation STUNNED = RawAnimation.begin().thenLoop("animation.sf_nba.rhino.stunned");
 
     public Rhino(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -68,7 +74,7 @@ public class Rhino extends Animal implements GeoEntity {
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @javax.annotation.Nullable SpawnGroupData pSpawnData, @javax.annotation.Nullable CompoundTag pDataTag) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
         if (pSpawnData == null) {
             pSpawnData = new AgeableMobGroupData(1.0F);
         }
@@ -243,21 +249,21 @@ public class Rhino extends Animal implements GeoEntity {
 
     private <E extends Rhino> PlayState predicate(final AnimationState<E> event) {
         if (this.stunnedTick > 0) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("stunned"));
+            event.getController().setAnimation(STUNNED);
             event.getController().setAnimationSpeed(1.0F);
         } else if (event.isMoving()) {
             if (this.isSprinting()) {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("charge"));
+                event.getController().setAnimation(RUN);
                 event.getController().setAnimationSpeed(3.0F);
             } else {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("walk"));
+                event.getController().setAnimation(WALK);
                 event.getController().setAnimationSpeed(1.0F);
             }
         } else if (this.hasChargeCooldown() && this.hasTarget()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("foot"));
+            event.getController().setAnimation(FOOT);
             event.getController().setAnimationSpeed(1.0F);
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
+            event.getController().setAnimation(IDLE);
             event.getController().setAnimationSpeed(1.0F);
         }
         return PlayState.CONTINUE;
@@ -276,7 +282,7 @@ public class Rhino extends Animal implements GeoEntity {
         if (this.swinging && event.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
             event.getController().forceAnimationReset();
         
-            event.getController().setAnimation(RawAnimation.begin().thenPlay("attack"));
+            event.getController().setAnimation(ATTACK);
             event.getController().setAnimationSpeed(0.8F);
             this.swinging = false;
         }

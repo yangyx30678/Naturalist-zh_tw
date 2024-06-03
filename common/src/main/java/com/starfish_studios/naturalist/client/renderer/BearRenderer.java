@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.BearModel;
 import com.starfish_studios.naturalist.client.renderer.layers.BearShearedLayer;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Bear;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,6 +24,11 @@ public class BearRenderer extends GeoEntityRenderer<Bear> {
         super(renderManager, new BearModel());
         this.shadowRadius = 0.9F;
         this.addRenderLayer(new BearShearedLayer(this));
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Bear animatable) {
+        return 0.000001f;
     }
 
     @Override

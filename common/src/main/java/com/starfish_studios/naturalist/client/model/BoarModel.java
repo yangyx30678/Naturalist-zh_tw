@@ -26,7 +26,7 @@ public class BoarModel extends GeoModel<Boar> {
 
     @Override
     public ResourceLocation getAnimationResource(Boar boar) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/boar.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/boar.rp_anim.json");
     }
 
     @Override

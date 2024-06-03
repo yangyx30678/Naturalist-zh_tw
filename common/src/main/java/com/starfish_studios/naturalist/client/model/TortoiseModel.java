@@ -31,7 +31,7 @@ public class TortoiseModel extends GeoModel<Tortoise> {
 
     @Override
     public ResourceLocation getAnimationResource(Tortoise tortoise) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/tortoise.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/tortoise.rp_anim.json");
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.starfish_studios.naturalist.common.entity;
 
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.FlyingWanderGoal;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -35,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -44,10 +44,14 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class Firefly extends Animal implements FlyingAnimal, GeoEntity {
+public class Firefly extends Animal implements FlyingAnimal, NaturalistGeoEntity {
+    // region VARIABLES
     private static final EntityDataAccessor<Integer> GLOW_TICKS_REMAINING = SynchedEntityData.defineId(Firefly.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> SUN_TICKS = SynchedEntityData.defineId(Firefly.class, EntityDataSerializers.INT);
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+
+    protected static final RawAnimation FLY = RawAnimation.begin().thenLoop("animation.sf_nba.firefly.fly");
+    // endregion
 
     @Override
     @NotNull
@@ -219,26 +223,26 @@ public class Firefly extends Animal implements FlyingAnimal, GeoEntity {
         return NaturalistSoundEvents.FIREFLY_DEATH.get();
     }
 
+    // region GECKOLIB
+    @Override
+    public double getBoneResetTime() {
+        return 2;
+    }
+
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.geoCache;
     }
 
     private <E extends Firefly> PlayState predicate(final AnimationState<E> event) {
-        if (this.isFlying()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("firefly.fly"));
-            return PlayState.CONTINUE;
-        }
-        event.getController().forceAnimationReset();
-        
-        return PlayState.STOP;
+        event.getController().setAnimation(FLY);
+        return PlayState.CONTINUE;
     }
 
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // TODO: used to be 5
-        // data.setResetSpeedInTicks(5);
-        controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
+        controllers.add(new AnimationController<>(this, "controller", 2, this::predicate));
     }
+    // endregion
 
 
     static class FireflyHideInGrassGoal extends MoveToBlockGoal {

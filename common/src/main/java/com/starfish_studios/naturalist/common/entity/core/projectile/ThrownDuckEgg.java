@@ -1,10 +1,10 @@
 package com.starfish_studios.naturalist.common.entity.core.projectile;
 
 import com.starfish_studios.naturalist.common.entity.Duck;
-import com.starfish_studios.naturalist.core.registry.*;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;

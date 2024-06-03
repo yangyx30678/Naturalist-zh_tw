@@ -5,10 +5,9 @@ import com.starfish_studios.naturalist.common.entity.core.ai.goal.BabyPanicGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.DistancedFollowParentGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.SmoothFloatGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.navigation.MMPathNavigatorGround;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ItemParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -41,7 +40,7 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.Path;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -53,7 +52,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.EnumSet;
 import java.util.List;
 
-public class Hippo extends Animal implements GeoEntity {
+public class Hippo extends Animal implements NaturalistGeoEntity {
 
     protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.hippo.idle");
     protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.hippo.walk");

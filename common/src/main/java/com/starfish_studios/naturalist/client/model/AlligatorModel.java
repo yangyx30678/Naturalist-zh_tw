@@ -27,7 +27,7 @@ public class AlligatorModel extends GeoModel<Alligator> {
 
     @Override
     public ResourceLocation getAnimationResource(Alligator alligator) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/alligator.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/alligator.rp_anim.json");
     }
 
     @Override
@@ -38,6 +38,7 @@ public class AlligatorModel extends GeoModel<Alligator> {
 
         EntityModelData extraDataOfType = animationState.getData(DataTickets.ENTITY_MODEL_DATA);
         CoreGeoBone head = this.getAnimationProcessor().getBone("head");
+        CoreGeoBone tail = this.getAnimationProcessor().getBone("tail");
 
         if (entity.isBaby()) {
             head.setScaleX(1.5F);
@@ -49,6 +50,7 @@ public class AlligatorModel extends GeoModel<Alligator> {
             head.setScaleZ(1.0F);
         }
 
+        head.setRotX(extraDataOfType.headPitch() * Mth.DEG_TO_RAD);
         head.setRotY(extraDataOfType.netHeadYaw() * Mth.DEG_TO_RAD);
     }
 }

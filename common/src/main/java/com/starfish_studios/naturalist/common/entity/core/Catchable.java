@@ -7,9 +7,8 @@ package com.starfish_studios.naturalist.common.entity.core;
 
 import java.util.Optional;
 
-import com.starfish_studios.naturalist.common.entity.*;
 import com.starfish_studios.naturalist.common.helper.*;
-import com.starfish_studios.naturalist.core.registry.*;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,9 +20,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemUtils;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.Level;
 
 public interface Catchable {
     boolean fromHand();

@@ -1,9 +1,10 @@
 package com.starfish_studios.naturalist.common.entity;
 
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.FollowAdultGoal;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -36,7 +37,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -45,7 +46,7 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-public class Bird extends ShoulderRidingEntity implements FlyingAnimal, GeoEntity {
+public class Bird extends ShoulderRidingEntity implements FlyingAnimal, NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private BirdAvoidEntityGoal<Player> avoidPlayersGoal;
     private static final Ingredient TAME_FOOD = Ingredient.of(NaturalistTags.ItemTags.BIRD_FOOD_ITEMS);
@@ -57,6 +58,11 @@ public class Bird extends ShoulderRidingEntity implements FlyingAnimal, GeoEntit
     private float flapping = 1.0F;
     private float nextFlap = 1.0F;
     private boolean isWet;
+
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.bird.idle");
+    protected static final RawAnimation FLY = RawAnimation.begin().thenLoop("animation.sf_nba.bird.fly");
+    protected static final RawAnimation SIT = RawAnimation.begin().thenLoop("animation.sf_nba.bird.sit");
 
     public Bird(EntityType<? extends ShoulderRidingEntity> entityType, Level level) {
         super(entityType, level);
@@ -313,24 +319,30 @@ public class Bird extends ShoulderRidingEntity implements FlyingAnimal, GeoEntit
 
 
     @Override
+    public double getBoneResetTime() {
+        return 2;
+    }
+
+    @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.geoCache;
     }
 
     protected <E extends Bird> PlayState predicate(final AnimationState<E> event) {
         if (this.isInSittingPose()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("bird.sit"));
+            event.getController().setAnimation(SIT);
             return PlayState.CONTINUE;
         } else if (this.isFlying()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("bird.fly"));
+            event.getController().setAnimation(FLY);
             return PlayState.CONTINUE;
         } /* else if (this.isPecking()) {
             event.getController().setAnimation(new AnimationBuilder().loop("bird.peck"));
             return PlayState.CONTINUE;
         */
-        event.getController().forceAnimationReset();
-        
-        return PlayState.STOP;
+        else {
+            event.getController().setAnimation(IDLE);
+            return PlayState.CONTINUE;
+        }
     }
 
     @Override

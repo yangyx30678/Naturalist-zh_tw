@@ -1,6 +1,7 @@
 package com.starfish_studios.naturalist.common.entity;
 
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
@@ -29,7 +30,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -38,14 +39,16 @@ import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
-public class Dragonfly extends PathfinderMob implements GeoEntity {
+public class Dragonfly extends PathfinderMob implements NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final EntityDataAccessor<Integer> VARIANT_ID = SynchedEntityData.defineId(Dragonfly.class, EntityDataSerializers.INT);
     @Nullable
     private BlockPos targetPosition;
     private int hoverTicks;
+
+    protected static final RawAnimation FLY = RawAnimation.begin().thenLoop("animation.sf_nba.dragonfly.fly");
 
     @Override
     @NotNull
@@ -221,7 +224,7 @@ public class Dragonfly extends PathfinderMob implements GeoEntity {
     }
 
     protected <E extends Dragonfly> PlayState predicate(final AnimationState<E> event) {
-        event.getController().setAnimation(RawAnimation.begin().thenLoop("dragonfly.fly"));
+        event.getController().setAnimation(FLY);
         return PlayState.CONTINUE;
     }
 

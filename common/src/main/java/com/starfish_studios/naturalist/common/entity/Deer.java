@@ -1,10 +1,11 @@
 package com.starfish_studios.naturalist.common.entity;
 
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.AlertOthersPanicGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.navigation.MMPathNavigatorGround;
-import com.starfish_studios.naturalist.core.registry.NaturalistEntityTypes;
-import com.starfish_studios.naturalist.core.registry.NaturalistSoundEvents;
-import com.starfish_studios.naturalist.core.registry.NaturalistTags;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -25,7 +26,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
@@ -36,11 +37,16 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class Deer extends Animal implements GeoEntity {
+public class Deer extends Animal implements NaturalistGeoEntity {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private int panicTicks = 0;
     private int eatAnimationTick;
     private EatBlockGoal eatBlockGoal;
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.deer.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.deer.walk");
+    protected static final RawAnimation RUN = RawAnimation.begin().thenLoop("animation.sf_nba.deer.run");
+    protected static final RawAnimation EAT = RawAnimation.begin().thenLoop("animation.sf_nba.deer.eat");
 
     public Deer(EntityType<? extends Animal> entityType, Level level) {
         super(entityType, level);
@@ -182,18 +188,18 @@ public class Deer extends Animal implements GeoEntity {
 
     protected <E extends Deer> PlayState predicate(final AnimationState<E> event) {
         if (this.isEating()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("eat"));
+            event.getController().setAnimation(EAT);
             event.getController().setAnimationSpeed(1.0D);
         } else if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
             if (this.isSprinting()) {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("run"));
+                event.getController().setAnimation(RUN);
                 event.getController().setAnimationSpeed(2.3D);
             } else {
-                event.getController().setAnimation(RawAnimation.begin().thenLoop("walk"));
+                event.getController().setAnimation(WALK);
                 event.getController().setAnimationSpeed(1.0D);
             }
         } else {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("idle"));
+            event.getController().setAnimation(IDLE);
             event.getController().setAnimationSpeed(1.0D);
         }
         return PlayState.CONTINUE;

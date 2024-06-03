@@ -31,7 +31,7 @@ public class DuckModel extends GeoModel<Duck> {
 
     @Override
     public ResourceLocation getAnimationResource(Duck animal) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/duck.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/duck.rp_anim.json");
     }
 
     @Override

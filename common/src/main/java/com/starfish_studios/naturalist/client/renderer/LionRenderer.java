@@ -3,6 +3,7 @@ package com.starfish_studios.naturalist.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.LionModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Lion;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +19,11 @@ public class LionRenderer extends GeoEntityRenderer<Lion> {
     public LionRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new LionModel());
         this.shadowRadius = 1.1F;
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Lion animatable) {
+        return 0.000001f;
     }
 
     @Override

@@ -5,7 +5,10 @@ import com.starfish_studios.naturalist.common.entity.core.HidingAnimal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.EggLayingBreedGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.HideGoal;
 import com.starfish_studios.naturalist.common.entity.core.ai.goal.LayEggGoal;
-import com.starfish_studios.naturalist.core.registry.*;
+import com.starfish_studios.naturalist.registry.NaturalistEntityTypes;
+import com.starfish_studios.naturalist.registry.NaturalistRegistry;
+import com.starfish_studios.naturalist.registry.NaturalistSoundEvents;
+import com.starfish_studios.naturalist.registry.NaturalistTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
@@ -38,19 +41,21 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
+import com.starfish_studios.naturalist.common.entity.core.NaturalistGeoEntity;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.keyframe.event.SoundKeyframeEvent;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class Tortoise extends TamableAnimal implements GeoEntity, HidingAnimal, EggLayingAnimal {
+public class Tortoise extends TamableAnimal implements NaturalistGeoEntity, HidingAnimal, EggLayingAnimal {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private static final Ingredient TEMPT_ITEMS = Ingredient.of(NaturalistTags.ItemTags.TORTOISE_TEMPT_ITEMS);
     private static final EntityDataAccessor<Integer> VARIANT_ID = SynchedEntityData.defineId(Tortoise.class, EntityDataSerializers.INT);
@@ -58,6 +63,14 @@ public class Tortoise extends TamableAnimal implements GeoEntity, HidingAnimal, 
     private static final EntityDataAccessor<Boolean> LAYING_EGG = SynchedEntityData.defineId(Tortoise.class, EntityDataSerializers.BOOLEAN);
     int layEggCounter;
     boolean isDigging;
+
+    protected static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.sf_nba.tortoise.idle");
+    protected static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.sf_nba.tortoise.walk");
+    protected static final RawAnimation SIT = RawAnimation.begin().thenLoop("animation.sf_nba.tortoise.sit");
+    protected static final RawAnimation HIDE = RawAnimation.begin().thenPlay("animation.sf_nba.tortoise.hide").thenLoop("animation.sf_nba.tortoise.hide_idle");
+    protected static final RawAnimation DIG = RawAnimation.begin().thenLoop("animation.sf_nba.tortoise.dig");
+    protected static final RawAnimation HURT = RawAnimation.begin().thenLoop("animation.sf_nba.tortoise.hurt");
+
 
     public Tortoise(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
@@ -78,6 +91,7 @@ public class Tortoise extends TamableAnimal implements GeoEntity, HidingAnimal, 
     public AgeableMob getBreedOffspring(ServerLevel level, AgeableMob otherParent) {
         Tortoise tortoise = NaturalistEntityTypes.TORTOISE.get().create(level);
         if (otherParent instanceof Tortoise tortoiseParent) {
+            assert tortoise != null;
             if (this.getVariant() == tortoiseParent.getVariant()) {
                 tortoise.setVariant(this.getVariant());
             } else {
@@ -273,31 +287,38 @@ public class Tortoise extends TamableAnimal implements GeoEntity, HidingAnimal, 
 
     private <T extends Tortoise> PlayState predicate(final AnimationState<T> event) {
         if (this.isInSittingPose()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("tortoise.sit"));
-            return PlayState.CONTINUE;
-        } else if (this.canHide()) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("tortoise.hide"));
+            event.getController().setAnimation(SIT);
             return PlayState.CONTINUE;
         } else if (this.isLayingEgg())  {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("tortoise.dig"));
+            event.getController().setAnimation(DIG);
             return PlayState.CONTINUE;
         } else if (this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("tortoise.walk"));
+            event.getController().setAnimation(WALK);
             if (this.isBaby()) {
                 event.getController().setAnimationSpeed(2.0D);
             } else {
-                event.getController().setAnimationSpeed(1.1D);
+                event.getController().setAnimationSpeed(1.3D);
             }
+            return PlayState.CONTINUE;
+        } else {
+            event.getController().setAnimation(IDLE);
+            return PlayState.CONTINUE;
+        }
+    }
+
+    private <T extends Tortoise> PlayState hidePredicate(final AnimationState<T> event) {
+        if( this.canHide()) {
+            event.getController().setAnimation(HIDE);
             return PlayState.CONTINUE;
         }
         event.getController().forceAnimationReset();
-        
+
         return PlayState.STOP;
     }
 
     private <T extends Tortoise> PlayState hurtPredicate(final AnimationState<T> event) {
         if(this.hurtTime > 0) {
-            event.getController().setAnimation(RawAnimation.begin().thenLoop("tortoise.hurt"));
+            event.getController().setAnimation(HURT);
             return PlayState.CONTINUE;
         }
         event.getController().forceAnimationReset();
@@ -307,10 +328,21 @@ public class Tortoise extends TamableAnimal implements GeoEntity, HidingAnimal, 
 
     @Override
     public void registerControllers(final AnimatableManager.ControllerRegistrar controllers) {
-        // TODO: used to be 5
-        // animationData.setResetSpeedInTicks(5);
         controllers.add(new AnimationController<>(this, "controller", 5, this::predicate));
         controllers.add(new AnimationController<>(this, "hurtController", 5, this::hurtPredicate));
+        controllers.add(new AnimationController<>(this, "hideController", 0, this::hidePredicate).setSoundKeyframeHandler(this::soundListener));
+    }
+
+    private void soundListener(SoundKeyframeEvent<Tortoise> event) {
+        Tortoise animatable = event.getAnimatable();
+        if (animatable.level().isClientSide) {
+            if (event.getKeyframeData().getSound().equals("hide")) {
+                animatable.level().playLocalSound(animatable.getX(), animatable.getY(), animatable.getZ(), NaturalistSoundEvents.TORTOISE_HIDE.get(), animatable.getSoundSource(), 0.5F, 1.0F, false);
+            }
+            if (event.getKeyframeData().getSound().equals("thud")) {
+                animatable.level().playLocalSound(animatable.getX(), animatable.getY(), animatable.getZ(), NaturalistSoundEvents.TORTOISE_THUD.get(), animatable.getSoundSource(), 0.5F, 1.0F, false);
+            }
+        }
     }
 
     @Override

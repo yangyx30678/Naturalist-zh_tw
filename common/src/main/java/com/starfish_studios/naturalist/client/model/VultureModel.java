@@ -26,7 +26,7 @@ public class VultureModel extends GeoModel<Vulture> {
 
     @Override
     public ResourceLocation getAnimationResource(Vulture vulture) {
-        return new ResourceLocation(Naturalist.MOD_ID, "animations/vulture.animation.json");
+        return new ResourceLocation(Naturalist.MOD_ID, "animations/vulture.rp_anim.json");
     }
 
     @Override

@@ -149,6 +149,12 @@
 
 
 
+  "naturalist.subtitles.entity.tortoise.hide": "Tortoise hides",
+  "naturalist.subtitles.entity.tortoise.thud": "Tortoise thuds",
+  "naturalist.subtitles.entity.tortoise.hurt": "Tortoise hurts",
+  "naturalist.subtitles.entity.tortoise.shell_block": "Tortoise shell blocks",
+  "naturalist.subtitles.entity.tortoise.death": "Tortoise dies",
+
 
   "naturalist.subtitles.entity.bird.hurt": "Bird hurts",
   "naturalist.subtitles.entity.bird.death": "Bird dies",

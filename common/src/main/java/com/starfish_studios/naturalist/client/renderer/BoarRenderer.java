@@ -3,6 +3,7 @@ package com.starfish_studios.naturalist.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.starfish_studios.naturalist.client.model.BoarModel;
+import com.starfish_studios.naturalist.common.entity.Alligator;
 import com.starfish_studios.naturalist.common.entity.Boar;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -18,6 +19,11 @@ public class BoarRenderer extends GeoEntityRenderer<Boar> {
     public BoarRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new BoarModel());
         this.shadowRadius = 0.7F;
+    }
+
+    @Override
+    public float getMotionAnimThreshold(Boar animatable) {
+        return 0.000001f;
     }
 
     @Override
